@@ -33,7 +33,8 @@ Claude Code.
 
 ## Files
 
-- `index.html`: the page, with the track animation, the derivation and the examples.
+- `index.html`: the page, with the track animation, the derivation, the surface
+  z = xy/(x − y) (as Michael plotted it in Grapher, turnable) and the examples.
 - `lapping.js`: `lapTime(X, Y)` and the example pairs, shared by the page and the tests.
 - `test.js`: checks the equation against the clock, the synodic month and the
   planets, and that the page's script parses. Run `node test.js`.
