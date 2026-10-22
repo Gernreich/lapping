@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lapping</title>
+<meta name="description" content="Two runners on a track: the faster laps the slower every Z = XY/(X − Y). The same equation gives when clock hands meet, the month of the Moon's phases and the gap between Earth and Mars oppositions.">
+<style>
+:root {
+  --bg: #fcfcfb; --surface: #f3f2ee; --ink: #0b0b0b; --ink-2: #52514e; --rule: #dddcd6;
+  --accent: #2a78d6; --slow: #d4740b; --fast: #2a78d6; --pass: #e34948; --track: #e4e2da;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1a1a19; --surface: #252523; --ink: #f0efec; --ink-2: #c3c2b7; --rule: #3a3a37;
+    --accent: #3987e5; --slow: #f0a03c; --fast: #5aa0ef; --pass: #e66767; --track: #33332f;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1a1a19; --surface: #252523; --ink: #f0efec; --ink-2: #c3c2b7; --rule: #3a3a37;
+  --accent: #3987e5; --slow: #f0a03c; --fast: #5aa0ef; --pass: #e66767; --track: #33332f;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 17px/1.6 ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+}
+main { max-width: 860px; overflow-wrap: break-word; margin: 0 auto; padding: 40px 16px 64px; }
+h1 { font-size: 2.1rem; line-height: 1.15; margin: 0 0 12px; letter-spacing: -0.01em; }
+h2 { font-size: 1.35rem; margin: 48px 0 8px; padding-top: 16px; border-top: 1px solid var(--rule); }
+.lede { font-size: 1.12rem; color: var(--ink-2); margin: 0 0 24px; }
+a { color: var(--accent); }
+code { font: 0.9em ui-monospace, SFMono-Regular, Menlo, monospace; }
+.eq { font-size: 1.6rem; font-weight: 650; text-align: center; margin: 20px 0; letter-spacing: 0.02em; }
+.credit { background: var(--surface); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 4px; }
+.panel { background: var(--surface); border-radius: 6px; padding: 14px 16px; margin-top: 12px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-top: 8px; font-size: 0.92rem; }
+button { font: inherit; font-size: 0.88rem; color: var(--ink); background: transparent;
+  border: 1px solid var(--rule); border-radius: 4px; padding: 3px 12px; cursor: pointer; }
+button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+input[type="number"] { font: inherit; width: 8em; background: var(--bg); color: var(--ink);
+  border: 1px solid var(--rule); border-radius: 4px; padding: 2px 6px; }
+.sim { display: grid; grid-template-columns: minmax(0, 320px) 1fr; gap: 16px 24px; align-items: center; margin-top: 12px; }
+@media (max-width: 620px) { .sim { grid-template-columns: 1fr; } }
+#track { width: 100%; max-width: 320px; display: block; margin: 0 auto; }
+#track .lane { fill: none; stroke: var(--track); stroke-width: 14; }
+#track .start { stroke: var(--ink-2); stroke-width: 2; }
+#track .hand { stroke-width: 3; stroke-linecap: round; }
+#track .slow { stroke: var(--slow); fill: var(--slow); }
+#track .fast { stroke: var(--fast); fill: var(--fast); }
+#track .flash { fill: none; stroke: var(--pass); stroke-width: 3; opacity: 0; }
+.key b.slow { color: var(--slow); } .key b.fast { color: var(--fast); }
+.big { font-size: 1.5rem; font-weight: 650; }
+.stats { font-size: 0.95rem; }
+.stats div { margin: 2px 0; }
+.note { color: var(--ink-2); font-size: 0.95rem; margin-top: 10px; }
+.err { color: var(--pass); }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; margin-top: 12px; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.scroll { overflow-x: auto; }
+</style>
+</head>
+<body>
+<main>
+<h1>Lapping</h1>
+<p><strong><a href="https://gernreich.github.io/">← All projects</a></strong></p>
+<p class="lede">Two people race round a track, and one is faster than the other. How long until the
+faster one laps the slower one? The answer is one short equation, and the same equation tells
+you when the hands of a clock meet, why the Moon's phases repeat every 29½ days and not every
+27⅓, and how often the Earth overtakes Mars.</p>
+
+<p class="eq">Z = (X × Y) / (X − Y)</p>
+<p><b>X</b> is the slower runner's lap time, <b>Y</b> the faster runner's, and <b>Z</b> the time
+between one passing and the next.</p>
+
+<p class="credit">Michael Carnright worked this equation out for himself at sixteen. It is the
+same relation astronomers use for a <em>synodic period</em>, the time for two orbiting bodies to
+come back into line, though he arrived at it from two runners on a track. The page and its
+code are by Claude Code.</p>
+
+<h2 id="watch">Watch it</h2>
+<div class="panel">
+  <div class="row" id="presets" role="group" aria-label="Examples"></div>
+  <div class="row">
+    <label>X (slower lap) <input type="number" id="x" min="0" step="any"></label>
+    <label>Y (faster lap) <input type="number" id="y" min="0" step="any"></label>
+    <span id="unit"></span>
+  </div>
+  <div class="sim">
+    <svg id="track" viewBox="-110 -110 220 220" role="img" aria-label="Two runners on a circular track; a ring flashes each time the faster one passes the slower one">
+      <circle class="lane" r="92"/>
+      <circle class="lane" r="68"/>
+      <line class="start" x1="0" y1="-104" x2="0" y2="-56"/>
+      <line class="hand slow" id="hs" x1="0" y1="0" x2="0" y2="-68"/>
+      <line class="hand fast" id="hf" x1="0" y1="0" x2="0" y2="-92"/>
+      <circle class="slow" id="ds" r="8" cy="-68"/>
+      <circle class="fast" id="df" r="8" cy="-92"/>
+      <circle class="flash" id="fl" r="100"/>
+      <circle r="3" fill="currentColor"/>
+    </svg>
+    <div>
+      <div class="key"><b class="slow">●</b> <span id="slowName"></span>, a lap every <span id="xs"></span><br>
+        <b class="fast">●</b> <span id="fastName"></span>, a lap every <span id="ys"></span></div>
+      <p>Laps every <span class="big" id="z"></span></p>
+      <div class="stats" aria-live="polite">
+        <div>Time: <span id="t"></span></div>
+        <div>Passes so far: <span id="passes">0</span></div>
+      </div>
+      <div class="row"><button type="button" id="play" aria-pressed="true">Pause</button>
+        <button type="button" id="reset">Start again</button></div>
+    </div>
+  </div>
+  <p class="note" id="note"></p>
+</div>
+
+<h2 id="why">Why it works</h2>
+<p>Measure speed in laps per unit of time. The faster runner covers <code>1/Y</code> of a lap
+each unit of time and the slower one <code>1/X</code>, so the faster runner pulls ahead by
+<code>1/Y − 1/X</code> of a lap each unit. It passes the slower runner again when it has pulled
+ahead by one whole lap:</p>
+<p class="eq">Z × (1/Y − 1/X) = 1</p>
+<p>and solving for Z gives <code>Z = 1 / (1/Y − 1/X) = XY / (X − Y)</code>. In that time the
+faster runner has run <code>Z/Y = X/(X − Y)</code> laps and the slower one
+<code>Z/X = Y/(X − Y)</code>, exactly one fewer.</p>
+<p>Nothing in this needs the runners to start together, or the track to be any particular
+length. Only the two lap times matter. That is why the same equation fits a clock face and the
+solar system: anything that goes round and round at a steady rate is a runner on a track.</p>
+<ul>
+  <li>If X is barely more than Y, X − Y is tiny and Z is huge: two runners of almost equal
+    speed run side by side for a long time.</li>
+  <li>If X is much larger than Y, Z is only a little more than Y: the slower runner is nearly
+    standing still, and the faster one has to cover just a bit more than one lap to catch it.</li>
+  <li>If X = 2Y, Z = 2Y = X: the faster runner catches up once each time the slower one completes a lap.</li>
+</ul>
+
+<h2 id="examples">The examples</h2>
+<div class="scroll"><table id="table">
+  <thead><tr><th>Pair</th><th>X (slower)</th><th>Y (faster)</th><th>Z (laps every)</th></tr></thead>
+  <tbody></tbody>
+</table></div>
+<p class="note">Orbital periods are sidereal, measured against the stars: the Earth's year
+365.256 days, the Moon's month 27.322 days, Mars 686.98 days, Venus 224.70 days.</p>
+
+</main>
+<script src="lapping.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const fmt = (v, d = 2) => (+v.toFixed(d)).toLocaleString('en');
+function human(v, unit) {
+  if (unit === 'hours') { const m = v * 60; return `${fmt(v, 4)} hours (${Math.floor(m)} min ${fmt((m % 1) * 60, 1)} s)`; }
+  if (unit === 'days' && v > 365) return `${fmt(v, 1)} days (${fmt(v / 365.25, 2)} years)`;
+  return `${fmt(v, 2)} ${unit}`;
+}
+
+// table
+for (const p of PAIRS) {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${p.name}<br><span class="note">${p.note}</span></td>` +
+    `<td class="n">${fmt(p.X, 2)}</td><td class="n">${fmt(p.Y, 2)}</td><td class="n">${human(lapTime(p.X, p.Y), p.unit)}</td>`;
+  $('table').tBodies[0].append(tr);
+}
+
+let cur = PAIRS[0], X = cur.X, Y = cur.Y, Z = lapTime(X, Y);
+let t = 0, passes = 0, playing = true, last = null;
+const rad = f => f * 2 * Math.PI;
+
+function choose(p) {
+  cur = p;
+  for (const b of $('presets').children) b.setAttribute('aria-pressed', b.dataset.id === p.id);
+  $('x').value = p.X; $('y').value = p.Y;
+  $('slowName').textContent = p.slow[0].toUpperCase() + p.slow.slice(1);
+  $('fastName').textContent = p.fast[0].toUpperCase() + p.fast.slice(1);
+  $('note').textContent = p.note;
+  $('unit').textContent = p.unit;
+  update();
+}
+function update() {
+  const x = +$('x').value, y = +$('y').value;
+  if (!(x > y && y > 0)) { $('z').innerHTML = '<span class="err">X must be larger than Y</span>'; return; }
+  X = x; Y = y; Z = lapTime(X, Y);
+  $('xs').textContent = human(X, cur.unit); $('ys').textContent = human(Y, cur.unit);
+  $('z').textContent = human(Z, cur.unit);
+  t = 0; passes = 0; draw();
+}
+function place(hand, dot, r, frac) {
+  const a = rad(frac), px = r * Math.sin(a), py = -r * Math.cos(a);
+  hand.setAttribute('x2', px.toFixed(2)); hand.setAttribute('y2', py.toFixed(2));
+  dot.setAttribute('cx', px.toFixed(2)); dot.setAttribute('cy', py.toFixed(2));
+}
+function draw() {
+  place($('hs'), $('ds'), 68, (t / X) % 1);
+  place($('hf'), $('df'), 92, (t / Y) % 1);
+  $('t').textContent = human(t, cur.unit).replace(/ \(.*\)/, '');
+  $('passes').textContent = passes;
+}
+// The faster runner takes about 2.4 s of screen time per lap.
+function frame(ms) {
+  if (playing && last !== null) {
+    const before = Math.floor(t / Z);
+    t += (ms - last) / 1000 * Y / 2.4;
+    if (Math.floor(t / Z) > before) {
+      passes += Math.floor(t / Z) - before;
+      $('fl').animate([{ opacity: 1 }, { opacity: 0 }], { duration: 700 });
+    }
+    draw();
+  }
+  last = ms;
+  requestAnimationFrame(frame);
+}
+
+for (const p of PAIRS) {
+  const b = document.createElement('button');
+  b.type = 'button'; b.dataset.id = p.id; b.textContent = p.name;
+  b.onclick = () => choose(p);
+  $('presets').append(b);
+}
+$('x').oninput = $('y').oninput = () => { for (const b of $('presets').children) b.setAttribute('aria-pressed', false); update(); };
+$('play').onclick = () => { playing = !playing; $('play').textContent = playing ? 'Pause' : 'Play'; $('play').setAttribute('aria-pressed', playing); };
+$('reset').onclick = () => { t = 0; passes = 0; draw(); };
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) { playing = false; $('play').textContent = 'Play'; $('play').setAttribute('aria-pressed', false); }
+choose(PAIRS[0]);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
